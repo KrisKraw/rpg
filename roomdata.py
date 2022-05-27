@@ -7,7 +7,7 @@ rooms = {
                   'directions'  : {'south' : 'Kitchen','east'  : 'Dining Room','north'  : 'Library','west'  : 'Stairs'}
                 },
             'Kitchen' : {
-                  'items'  : ['Broccoli'],
+                  'items'  : ['cake'],
                   'directions'  : {'north' : 'Hall'}
                 },
             'Dining Room' : {
