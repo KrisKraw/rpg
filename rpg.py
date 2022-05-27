@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+
 def showInstructions():
   #print a main menu and the commands
   print('''
@@ -17,9 +18,20 @@ def showStatus():
   #print the current inventory
   print('Inventory : ' + str(inventory))
   #print an item if there is one
-  if "item" in rooms[currentRoom]:
-    print('You see a ' + rooms[currentRoom]['item'])
+  room = rooms[currentRoom]
+  if "items" in room:
+    availableItems = ''
+    for item in room['items']:
+      availableItems = availableItems + ' ' + "'" + item + "'"
+    print('You see a ' + availableItems)
   print("---------------------------")
+  print("you can go:")
+
+  room = rooms[currentRoom]
+  directions = ''
+  for direction in room['directions']:
+      directions = directions + ' ' + direction
+  print(directions)
 
 #an inventory, which is initially empty
 inventory = []
@@ -27,29 +39,33 @@ inventory = []
 #a dictionary linking a room to other rooms
 ## A dictionary linking a room to other rooms
 rooms = {
-
             'Hall' : {
-                  'south' : 'Kitchen',
-                  'east'  : 'Dining Room',
-                  'item'  : 'key'
+                  'items'  : ['key','letter','dagger'],
+                  'directions'  : {'south' : 'Kitchen','east'  : 'Dining Room','north'  : 'Library','west'  : 'Stairs'}
                 },
-
             'Kitchen' : {
-                  'north' : 'Hall',
-                  'item'  : 'monster',
+                  'items'  : ['monster'],
+                  'directions'  : {'north' : 'Hall'}
                 },
             'Dining Room' : {
-                  'west' : 'Hall',
-                  'south': 'Garden',
-                  'item' : 'potion',
-                  'north' : 'Pantry',
+                  'items'  : ['candle stick','bottle of vodka','potion'],
+                  'directions'  : {'west' : 'Hall','south': 'Garden','north' : 'Pantry'}
                },
             'Garden' : {
-                  'north' : 'Dining Room'
+                  'items'  : ['ax','shovel'],
+                  'directions'  : {'north' : 'Dining Room'},
                },
             'Pantry' : {
-                  'south' : 'Dining Room',
-                  'item' : 'cookie',
+                  'items' : ['cookie', 'rat poison'],
+                  'directions'  : {'south' : 'Dining Room'}
+            },
+            'Library' : {
+                  'items' : ['letter opener', 'bible'],
+                  'directions'  : {'west' : 'Garden'}
+            },
+            'Stairs' : {
+                  'items' : ['dagger'],
+                  'directions'  : {'north' : {'Kitchen'}}
             }
          }
 
@@ -78,9 +94,9 @@ while True:
   #if they type 'go' first
   if move[0] == 'go':
     #check that they are allowed wherever they want to go
-    if move[1] in rooms[currentRoom]:
+    if move[1] in rooms[currentRoom]['directions']:
       #set the current room to the new room
-      currentRoom = rooms[currentRoom][move[1]]
+      currentRoom = rooms[currentRoom]['directions'][move[1]]
     #there is no door (link) to the new room
     else:
         print('You can\'t go that way!')
@@ -88,13 +104,14 @@ while True:
   #if they type 'get' first
   if move[0] == 'get' :
     #if the room contains an item, and the item is the one they want to get
-    if "item" in rooms[currentRoom] and move[1] in rooms[currentRoom]['item']:
+    if "items" in rooms[currentRoom] and move[1] in rooms[currentRoom]['items']:
       #add the item to their inventory
       inventory += [move[1]]
       #display a helpful message
-      print(move[1] + ' got!')
       #delete the item from the room
-      del rooms[currentRoom]['item']
+      item_index = rooms[currentRoom]['items'].index(move[1])
+      del rooms[currentRoom]['items'][item_index]
+      print('picked up ' + move[1])
     #otherwise, if the item isn't there to get
     else:
       #tell them they can't get it
@@ -106,6 +123,9 @@ while True:
     break
 
   ## If a player enters a room with a monster
-  elif 'item' in rooms[currentRoom] and 'monster' in rooms[currentRoom]['item']:
-    print('A monster has got you... GAME OVER!')
+  elif 'items' in rooms[currentRoom] and 'monster' in rooms[currentRoom]['items']:
+    if 'dagger' in inventory or 'ax' in inventory or 'rat poison' in inventory:
+        print('You killed the monster... YOU WIN!')
+    else:
+        print('A monster has got you... GAME OVER!')
     break
