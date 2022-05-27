@@ -27,7 +27,7 @@ def showStatus():
   print('Inventory : ' + str(inventory))
   #print an item if there is one
   room = rooms[currentRoom]
-  if "items" in room:
+  if len(room['items']) > 0:
     availableItems = ''
     for item in room['items']:
       availableItems = availableItems + ' ' + "'" + item + "'"
